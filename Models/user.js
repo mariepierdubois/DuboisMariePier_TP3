@@ -2,13 +2,13 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const userSchema = new Schema({
-  firstName: {
+  firstname: {
     type: String,
     required: [true, 'A firstname is required.'],
     minlength: [3, 'The firstname must be at least 3 caracters.'],
     maxlength: [50, 'The firstname must be less than or equal to 50 caracters.']
   },
-  lastName: {
+  lastname: {
     type: String,
     required: [true, 'A lastname is required.'],
     minlength: [3, 'The lastname must be at least 3 caracters.'],
@@ -39,6 +39,8 @@ const userSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product'
   }]
-})
+},
+{ timestamps: true }
+)
 
 module.exports = mongoose.model('User', userSchema)
