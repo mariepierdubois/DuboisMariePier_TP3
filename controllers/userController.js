@@ -5,7 +5,7 @@ const User = require('../models/user')
 // Get a list of all of the users
 // all values except email and password
 exports.getUsers = (req, res, next) => {
-  User.find({}, { email: 0, password: 0 }).sort({ firstName: 1 })
+  User.find({}, { email: 0, password: 0 }).sort({ firstname: 1 })
     .then(users => {
       res.status(200).json({
         users,

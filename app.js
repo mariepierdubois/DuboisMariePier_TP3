@@ -3,7 +3,14 @@
 const express = require('express')
 const app = express()
 const mongoose = require('mongoose')
+const dotenv = require('dotenv')
+dotenv.config()
+
 const usersRoutes = require('./routes/users')
+const productsRoutes = require('./routes/products')
+const categoriesRoutes = require('./routes/categories')
+const authentificationRoutes = require('./routes/auth')
+
 const port = 3000
 const errController = require('./controllers/errController')
 
@@ -14,8 +21,17 @@ app.use(express.urlencoded({
   extended: false
 }))
 
+// Login and signup
+app.use('/authentification', authentificationRoutes)
+
 // Users routes as a middleware
 app.use('/users', usersRoutes)
+
+// Products routes as a middleware
+app.use('/products', productsRoutes)
+
+// Categories routes as a middleware
+app.use('/categories', categoriesRoutes)
 
 // When there is a page not found
 app.use(errController.get404)
