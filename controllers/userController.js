@@ -1,6 +1,7 @@
 'use strict'
 
 const User = require('../models/user')
+const bcrypt = require('bcryptjs')
 
 // Get a list of all of the users
 // all values except email and password
@@ -44,13 +45,88 @@ exports.getUserId = (req, res, next) => {
 }
 
 exports.getUserProfile = (req, res, next) => {
-  console.log('This is the user profile')
+  const userId = req.user.userId
+  console.log(userId)
+  User.findOne({ _id: userId })
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ message: 'User not found ' })
+      }
+
+      res.status(200).json({
+        user,
+        pageTitle: 'You are looking at your profile.'
+      })
+    })
+    .catch(err => {
+      console.error(err)
+      res.status(500).json({ message: 'Internal server error' })
+    })
 }
 
 exports.putUserId = (req, res, next) => {
-  console.log('Update the profile of the user')
+  const { firstname, lastname, email, city, password } = req.body
+  const userId = req.params.id
+  const connectedUserId = req.user.userId
+
+  User.findById({ _id: userId })
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ message: 'User not found ' })
+      }
+
+      if (user.id !== connectedUserId) {
+        return res.status(401).json({ message: 'You are not authorized to update this profile.' })
+      }
+
+      user.firstname = firstname
+      user.lastname = lastname
+      user.email = email
+      user.city = city
+
+      bcrypt
+        .hash(password, 10)
+        .then((newSecretPassword) => {
+          user.password = newSecretPassword
+
+          return user.save() // Save the updated user object
+        })
+        .then(result => {
+          res.status(200).json(result)
+        })
+        .catch(err => {
+          next(err)
+        })
+    })
+    .catch(err => {
+      next(err)
+    })
 }
 
 exports.deleteUserId = (req, res, next) => {
-  console.log('The connected user can delete his or her profile')
+  const userId = req.params.id
+  const connectedUserId = req.user.userId
+
+  User.findById(userId)
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({ message: 'User not found ' })
+      }
+
+      if (user.id !== connectedUserId) {
+        return res.status(401).json({ message: 'You are not authorized to delete this profile.' })
+      }
+
+      return User.findByIdAndRemove(userId) // Only delete the profile if authorized
+    })
+    .then(deletedUser => {
+      if (!deletedUser) {
+        return res.status(404).json({ message: 'User not found' })
+      }
+
+      res.status(204).send()
+    })
+    .catch(err => {
+      next(err)
+    })
 }

@@ -22,7 +22,7 @@ app.use(express.urlencoded({
 }))
 
 // Login and signup
-app.use('/authentification', authentificationRoutes)
+app.use('/auth', authentificationRoutes)
 
 // Users routes as a middleware
 app.use('/users', usersRoutes)

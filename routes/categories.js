@@ -3,6 +3,8 @@ const router = express.Router()
 
 const categoryController = require('../controllers/categoryController')
 
+const isConnected = require('../middleware/is-connected')
+
 // doit retourner la liste des catégories
 router.get('/', categoryController.getCategories)
 

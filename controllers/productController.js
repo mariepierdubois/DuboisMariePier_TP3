@@ -63,3 +63,60 @@ exports.showUserProducts = (req, res, next) => {
       res.status(500).json({ message: 'Internal server error' })
     })
 }
+
+exports.createNewProduct = (req, res, next) => {
+  const { title, description, price, imageURL, categoryId } = req.body
+
+  const product = new Product({
+    title,
+    description,
+    price,
+    imageURL,
+    categoryId,
+    userId: req.user.userId
+  })
+
+  product.save()
+    .then(result => {
+      res.status(201).json({
+        message: 'Your product is created',
+        product: result
+      })
+    })
+    .catch(err => {
+      return res.status(422).json({
+        errorMessage: err.errors
+      })
+    })
+}
+
+exports.deleteProduct = (req, res, next) => {
+  const productId = req.params.id
+  const connectedUserId = req.user.userId
+
+  console.log(connectedUserId)
+
+  Product.findById({ _id: productId })
+    .then(product => {
+      console.log(product.userId)
+      if (!product) {
+        return res.status(404).json({ message: 'Product not found ' })
+      }
+
+      if (product.userId.toString() !== connectedUserId) {
+        return res.status(401).json({ message: 'You are not authorized to delete this product.' })
+      }
+
+      return Product.findByIdAndRemove(productId) // Only delete the profile if authorized
+    })
+    .then(deletedProduct => {
+      if (!deletedProduct) {
+        res.status(404).json({ message: 'Product not found' })
+      } else {
+        res.status(204).send()
+      }
+    })
+    .catch(err => {
+      next(err)
+    })
+}

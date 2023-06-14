@@ -37,14 +37,14 @@ const productSchema = new Schema({
       }
     ]
   },
-  categoryId: [{
+  categoryId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category'
-  }],
-  userId: [{
+  },
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
-  }],
+  },
   isSold: {
     type: Boolean,
     default: false
