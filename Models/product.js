@@ -22,13 +22,13 @@ const productSchema = new Schema({
       message: 'The price is not set correctly. It must be an integer and in cents.'
     },
     set: function (thePrice) {
-      return Math.round(thePrice * 100) // pour transformer le prix de $$ en cents
+      return Math.round(thePrice * 100) // from $$ to cents
     },
     get: function (thePrice) {
-      return (thePrice / 100).toFixed(2) // pour revenir aux décimales en $$
+      return (thePrice / 100).toFixed(2) // to come back to $$ with decimals
     }
   },
-  imageURL: {
+  imageUrl: {
     type: [
       {
         type: String,
@@ -39,11 +39,13 @@ const productSchema = new Schema({
   },
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category'
+    ref: 'Category',
+    required: true
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    required: true
   },
   isSold: {
     type: Boolean,

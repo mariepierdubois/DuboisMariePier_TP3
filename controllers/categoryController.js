@@ -19,14 +19,15 @@ exports.getCategories = (req, res, next) => {
     })
 }
 
-// Get the info of the /products/:id
+// Get the info of the /categories/:id
 exports.getCategoryId = (req, res, next) => {
-  const categoryId = req.params.id // Get the product ID from the URL parameter
+  // Get the category ID from the URL
+  const categoryId = req.params.id
 
-  Category.findById(categoryId) // Find the product by ID
+  Category.findById(categoryId)
     .then(category => {
       if (!category) {
-        // If no category found with the given ID, return an error response
+        // If no category found with the given ID, then return an error response
         return res.status(404).json({ message: 'Category not found' })
       }
 
@@ -36,22 +37,25 @@ exports.getCategoryId = (req, res, next) => {
       })
     })
     .catch(err => {
-      // Handle any errors that occur during the query or response
       console.error(err)
       res.status(500).json({ message: 'Internal server error' })
     })
 }
 
+// Create a new category
+// Only the admin is authorized
 exports.createNewCategory = (req, res, next) => {
   const { name } = req.body
   const connectedUserId = req.user.userId
 
+  // Verify if the user is connected first
   User.findById(connectedUserId)
     .then(user => {
       if (!user) {
         return res.status(404).json({ message: 'User not found' })
       }
 
+      // Check if the connected user is an admin
       if (!user.isAdmin) {
         return res.status(401).json({ message: 'You are not an admin, so not authorized to create a category.' })
       }
@@ -81,12 +85,14 @@ exports.putCategory = (req, res, next) => {
   const categoryId = req.params.id
   const connectedUserId = req.user.userId
 
+  // Check if the user is connected
   User.findById(connectedUserId)
     .then(user => {
       if (!user) {
         return res.status(404).json({ message: 'User not found ' })
       }
 
+      // Check if the user is admin
       if (!user.isAdmin) {
         return res.status(401).json({ message: 'You are not an admin, so not authorized to modify a category.' })
       }
@@ -97,6 +103,7 @@ exports.putCategory = (req, res, next) => {
             return res.status(404).json({ message: 'Category not found' })
           }
 
+          // Redefine the category name, then save
           category.name = name
           return category.save()
         })
@@ -112,16 +119,20 @@ exports.putCategory = (req, res, next) => {
     })
 }
 
+// Delete a category with its id
+// Only the admin can do it
 exports.deleteCategory = (req, res, next) => {
   const categoryId = req.params.id
   const connectedUserId = req.user.userId
 
+  // Check if the user is connected
   User.findById(connectedUserId)
     .then(user => {
       if (!user) {
         return res.status(404).json({ message: 'User not found' })
       }
 
+      // Check if the user is admin
       if (!user.isAdmin) {
         return res.status(401).json({ message: 'You are not an admin, so not authorized to delete a category.' })
       }
@@ -132,7 +143,7 @@ exports.deleteCategory = (req, res, next) => {
             return res.status(404).json({ message: 'Category not found' })
           }
 
-          return Category.findByIdAndRemove(categoryId) // Only delete the category if authorized
+          return Category.findByIdAndRemove(categoryId)
         })
         .then(deletedCategory => {
           if (!deletedCategory) {

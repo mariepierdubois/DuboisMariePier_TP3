@@ -5,28 +5,19 @@ const userController = require('../controllers/userController')
 
 const isConnected = require('../middleware/is-connected')
 
-// doit retourner la liste des users, SANS les emails et mdp
+// Return the users list, without email and password
 router.get('/', userController.getUsers)
 
-// retourne les infos de l'utilisateur connecté
+// Return the connected user's profile
 router.get('/profil', isConnected, userController.getUserProfile)
 
-// retourne l'user dnt le id est passé en paramètre (pas emails et mdp)
+// Return the infos of the user's id in the url
 router.get('/:id', userController.getUserId)
 
-// modifie l'user dont le id est passé en paramètre (seul l'user connecté peut modifier son profil)
-// le isAdmin ne peut pas être modifié
+// Update the connected user's profile
 router.put('/:id', isConnected, userController.putUserId)
 
-// supprimer l'user dont le id est passé en paramètre
-// seul l'user connecté peut supprimer son compte
+// Delete the connected user's profile
 router.delete('/:id', isConnected, userController.deleteUserId)
 
 module.exports = router
-
-// const res = JSON.parse(resBody)
-/* if (resCode.code === 200){
-    pm.collectionVariables.set("myToken", res.token)
-} else {
-    pm.collectionVariables.set("myToken", "")
-} */

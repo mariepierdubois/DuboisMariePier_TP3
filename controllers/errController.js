@@ -6,8 +6,9 @@ exports.logErrors = (err, req, res, next) => {
   res.status(err.statusCode).json({ message: err.message, statusCode: err.statusCode })
 }
 
+// When a page is not found
 exports.get404 = (req, res) => {
   res
     .status(404)
-    .json({ pageTitle: 'Nothing to be found.' })
+    .json({ pageTitle: 'No page to be found.' })
 }

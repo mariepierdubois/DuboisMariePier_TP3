@@ -23,9 +23,11 @@ exports.getUsers = (req, res, next) => {
 // Get the info of the /users/:id
 // all values except email and password
 exports.getUserId = (req, res, next) => {
-  const userId = req.params.id // Get the user ID from the URL parameter
+  // Get the user ID from the URL parameter
+  const userId = req.params.id
 
-  User.findById(userId, { email: 0, password: 0 }) // Find the user by ID and exclude email and password
+  // Find the user by ID, without email and password
+  User.findById(userId, { email: 0, password: 0 })
     .then(user => {
       if (!user) {
         // If no user found with the given ID, return an error response
@@ -38,15 +40,15 @@ exports.getUserId = (req, res, next) => {
       })
     })
     .catch(err => {
-      // Handle any errors that occur during the query or response
       console.error(err)
       res.status(500).json({ message: 'Internal server error' })
     })
 }
 
+// The connected user can get his/her own profile only
 exports.getUserProfile = (req, res, next) => {
+  // This is the connected user
   const userId = req.user.userId
-  console.log(userId)
   User.findOne({ _id: userId })
     .then(user => {
       if (!user) {
@@ -64,6 +66,7 @@ exports.getUserProfile = (req, res, next) => {
     })
 }
 
+// The connected user can update his/her own profile
 exports.putUserId = (req, res, next) => {
   const { firstname, lastname, email, city, password } = req.body
   const userId = req.params.id
@@ -75,21 +78,24 @@ exports.putUserId = (req, res, next) => {
         return res.status(404).json({ message: 'User not found ' })
       }
 
+      // Verify that the user found in the collection is the same as the connected user
       if (user.id !== connectedUserId) {
         return res.status(401).json({ message: 'You are not authorized to update this profile.' })
       }
 
+      // Update the values
       user.firstname = firstname
       user.lastname = lastname
       user.email = email
       user.city = city
 
+      // Encrypt the password again in case the user changed it
       bcrypt
         .hash(password, 10)
         .then((newSecretPassword) => {
           user.password = newSecretPassword
 
-          return user.save() // Save the updated user object
+          return user.save()
         })
         .then(result => {
           res.status(200).json(result)
@@ -103,6 +109,7 @@ exports.putUserId = (req, res, next) => {
     })
 }
 
+// Only the connected user can delete his/her own profile
 exports.deleteUserId = (req, res, next) => {
   const userId = req.params.id
   const connectedUserId = req.user.userId
@@ -113,11 +120,13 @@ exports.deleteUserId = (req, res, next) => {
         return res.status(404).json({ message: 'User not found ' })
       }
 
+      // Compare if the found user is the same as the connected user
       if (user.id !== connectedUserId) {
         return res.status(401).json({ message: 'You are not authorized to delete this profile.' })
       }
 
-      return User.findByIdAndRemove(userId) // Only delete the profile if authorized
+      // Then, if authorized, the profile is deleted
+      return User.findByIdAndRemove(userId)
     })
     .then(deletedUser => {
       if (!deletedUser) {

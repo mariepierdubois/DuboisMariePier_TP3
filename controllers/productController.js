@@ -20,9 +20,10 @@ exports.getProducts = (req, res, next) => {
 
 // Get the info of the /products/:id
 exports.getProductId = (req, res, next) => {
-  const productId = req.params.id // Get the product ID from the URL parameter
+  // Get the product ID from the URL
+  const productId = req.params.id
 
-  Product.findById(productId) // Find the product by ID
+  Product.findById(productId)
     .then(product => {
       if (!product) {
         // If no product found with the given ID, return an error response
@@ -35,7 +36,6 @@ exports.getProductId = (req, res, next) => {
       })
     })
     .catch(err => {
-      // Handle any errors that occur during the query or response
       console.error(err)
       res.status(500).json({ message: 'Internal server error' })
     })
@@ -43,9 +43,10 @@ exports.getProductId = (req, res, next) => {
 
 // Get the products created by the userId entered in the url
 exports.showUserProducts = (req, res, next) => {
-  const userId = req.params.userId // Get the user ID from the URL parameter
+  // Get the user ID from the URL
+  const userId = req.params.userId
 
-  Product.find({ userId }) // Find the products with the specified user ID
+  Product.find({ userId })
     .then(products => {
       if (products.length === 0) {
         // If no products found with the given user ID, return an error response
@@ -58,20 +59,21 @@ exports.showUserProducts = (req, res, next) => {
       })
     })
     .catch(err => {
-      // Handle any errors that occur during the query or response
       console.error(err)
       res.status(500).json({ message: 'Internal server error' })
     })
 }
 
+// The connected user can create a new product
+// His/her id will be associated with this new product
 exports.createNewProduct = (req, res, next) => {
-  const { title, description, price, imageURL, categoryId } = req.body
+  const { title, description, price, imageUrl, categoryId } = req.body
 
   const product = new Product({
     title,
     description,
     price,
-    imageURL,
+    imageUrl,
     categoryId,
     userId: req.user.userId
   })
@@ -90,24 +92,24 @@ exports.createNewProduct = (req, res, next) => {
     })
 }
 
+// The connected user can delete one of his/her products by putting the id in the url
 exports.deleteProduct = (req, res, next) => {
   const productId = req.params.id
   const connectedUserId = req.user.userId
 
-  console.log(connectedUserId)
-
+  // Find the product with the same id that is in the url
   Product.findById({ _id: productId })
     .then(product => {
-      console.log(product.userId)
       if (!product) {
         return res.status(404).json({ message: 'Product not found ' })
       }
 
+      // If the id associated with the product is not the same as the connected user's id, this means the user is not authorized
       if (product.userId.toString() !== connectedUserId) {
         return res.status(401).json({ message: 'You are not authorized to delete this product.' })
       }
 
-      return Product.findByIdAndRemove(productId) // Only delete the profile if authorized
+      return Product.findByIdAndRemove(productId)
     })
     .then(deletedProduct => {
       if (!deletedProduct) {

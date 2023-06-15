@@ -31,7 +31,8 @@ exports.login = (req, res, next) => {
         err.statusCode = 401
         throw err
       }
-      // Création du token JWT
+
+      // Create the JWT token
       const token = jwt.sign(
         {
           email: foundUser.email,
@@ -39,7 +40,7 @@ exports.login = (req, res, next) => {
           lastname: foundUser.lastname,
           userId: foundUser._id.toString()
         },
-        // use the secret key that is in .env
+        // Use the secret key that is in .env
         process.env.SECRET_JWT_TOKEN,
         { expiresIn: process.env.JWT_EXPIRATION }
       )
@@ -50,7 +51,7 @@ exports.login = (req, res, next) => {
     })
 }
 
-// Enregistre un utilisateur dans la bd
+// Signup the user in the database
 exports.signup = (req, res, next) => {
   const firstname = req.body.firstname
   const lastname = req.body.lastname
@@ -59,7 +60,7 @@ exports.signup = (req, res, next) => {
   const isAdmin = req.body.isAdmin
   const password = req.body.password
 
-  // Utilisation de bcrypt pour hacher le mot de passe
+  // Encrypt the password
   bcrypt
     .hash(password, 10)
     .then((secretPassword) => {

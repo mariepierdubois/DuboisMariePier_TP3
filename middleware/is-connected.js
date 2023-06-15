@@ -31,6 +31,7 @@ module.exports = (req, res, next) => {
     throw err
   }
 
+  // We can use req.user globally
   req.user = decodedToken
   console.log('decodedToken', decodedToken)
   next()
