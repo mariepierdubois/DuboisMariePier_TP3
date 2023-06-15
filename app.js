@@ -73,6 +73,18 @@ app.get('/search', (req, res) => {
     })
 })
 
+// Cors
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*')
+
+  res.setHeader(
+    'Access-Control-Allow-Methods',
+    'OPTIONS, GET, POST, PUT, PATCH, DELETE'
+  )
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+  next()
+})
+
 // Login and signup
 app.use('/auth', authentificationRoutes)
 
@@ -93,16 +105,3 @@ app.use(errController.get404)
 
 // errors management
 app.use(errController.logErrors)
-
-/* mongoose.connect(process.env.PROJECT_DATABASE)
-  .then(() => {
-    console.log('You are now connected to the database.')
-    app.listen(port, () => {
-      console.log(`Listening on port ${port}`)
-    })
-  })
-  .catch(err => {
-    console.log('The connexion to the database failed.', err)
-  }) */
-
-
