@@ -5,7 +5,6 @@ const mongoose = require('mongoose')
 const app = express()
 require('dotenv').config()
 
-const Product = require('./models/product')
 const removeAccents = require('remove-accents')
 
 const usersRoutes = require('./routes/users')
@@ -13,6 +12,8 @@ const productsRoutes = require('./routes/products')
 const categoriesRoutes = require('./routes/categories')
 const authentificationRoutes = require('./routes/auth')
 const cartRoutes = require('./routes/cart')
+
+const Product = require('./models/product')
 
 const port = 3000
 const errController = require('./controllers/errController')
